@@ -35,6 +35,7 @@ I had a network switch that was randomly disconnecting and reconnecting. The bui
     ```bash
     GOOS=windows GOARCH=amd64 go build -o tping.exe main.go
     ```
+4. Or just download & use "tping.exe"
 ## 🚀 Usage
 ```cmd
 ./tping google.com
