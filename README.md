@@ -1,7 +1,7 @@
 # tping
 ## _A CLI wrapper for the Windows `ping` command that adds timestamps to each line of output._
 
-![tping logo](https://raw.githubusercontent.com/muhammadhajipoor/tping/main/assets/tping-logo.png)
+![tping logo](https://github.com/MuhammadHajipoor/tping/blob/main/tping.png)
 
 ## 📝 Description
 
