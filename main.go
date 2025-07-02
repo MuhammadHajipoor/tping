@@ -5,8 +5,12 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"runtime"
 	"strings"
 	"time"
+
+	"golang.org/x/sys/windows"
+	"golang.org/x/term"
 )
 
 // Prints usage instructions for the tping command-line tool
@@ -44,17 +48,40 @@ Options:
     -6             Force using IPv6.`)
 }
 
+// Enables ANSI escape code support on Windows terminals
+func enableVirtualTerminalWindows() {
+	if runtime.GOOS == "windows" {
+		handle := windows.Stdout
+		var mode uint32
+		windows.GetConsoleMode(handle, &mode)
+		windows.SetConsoleMode(handle, mode|windows.ENABLE_VIRTUAL_TERMINAL_PROCESSING)
+	}
+}
+
 func main() {
 	// Get command-line arguments (excluding the program name)
 	args := os.Args[1:]
-
-	// Debug: print number of arguments
-	fmt.Print(len(args))
 
 	// If no arguments were provided, show usage and exit
 	if len(args) == 0 {
 		printUsage()
 		os.Exit(0)
+	}
+
+	// Enable ANSI color support on Windows
+	enableVirtualTerminalWindows()
+
+	// Check if the output is a terminal (TTY)
+	isTTY := term.IsTerminal(int(os.Stdout.Fd()))
+
+	// ANSI color codes (used only if output is a TTY)
+	green, red, yellow, white, reset := "", "", "", "", ""
+	if isTTY {
+		green = "\033[32m"
+		red = "\033[31m"
+		yellow = "\033[33m"
+		white = "\033[37m"
+		reset = "\033[0m"
 	}
 
 	// Create the command to execute (ping with all given arguments)
@@ -72,13 +99,6 @@ func main() {
 		fmt.Println("Failed to start command:", err)
 		return
 	}
-
-	// Define ANSI color codes for output formatting
-	green := "\033[32m"
-	red := "\033[31m"
-	yellow := "\033[33m"
-	white := "\033[37m"
-	reset := "\033[0m"
 
 	// Read the command output line-by-line in real-time
 	scanner := bufio.NewScanner(stdout)
